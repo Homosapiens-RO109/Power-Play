@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -26,23 +25,13 @@ public class LocalizationTest extends LinearOpMode {
         waitForStart();
 
         while (!isStopRequested()) {
-            final double triggerMovement = -gamepad1.right_trigger + gamepad1.left_trigger;
             drive.setWeightedDrivePower(
                     new Pose2d(
                             -gamepad1.left_stick_y,
                             -gamepad1.left_stick_x,
-                            triggerMovement
-//                            -gamepad1.right_stick_x
-//                            ^This is what it used to be like, replace this if shit breaks
-                            // TODO: right stick to right and left triggers
-                            // gen pula mea te prinzi tu maine
-                            // muie
+                            -gamepad1.right_stick_x
                     )
             );
-
-            // TODO: rumble weakly at 35 seconds
-            // TODO: rumble harder at 30 seconds
-            // TODO: rumble very hard at 5 seconds
 
             drive.update();
 

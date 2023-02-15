@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.arm_control;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.Arrays;
 import java.util.List;
 
+@Config
 public class ArmControl {
     public static DcMotor armMotor1 = null;
     public static DcMotor armMotor2 = null;
@@ -21,7 +23,7 @@ public class ArmControl {
     private static final List<Integer> armMotorLevels = Arrays.asList(30, 1300, 2100, 2920);
 
     private static final double ARM_MOTOR_POWER_UP = 0.85;
-    private static final double ARM_MOTOR_POWER_DOWN = 0.40;
+    private static final double ARM_MOTOR_POWER_DOWN = 0.75;
 
     private static double currentArmPower = 0.0;
 
@@ -49,11 +51,11 @@ public class ArmControl {
         armMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        armMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        armMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         clipServo = hwm.get(Servo.class, "s_armclip"); // sau nu asa
 
@@ -100,7 +102,6 @@ public class ArmControl {
             currentArmPower = ARM_MOTOR_POWER_DOWN;
         }
 
-
         armMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -113,12 +114,10 @@ public class ArmControl {
     }
 
     public static void openClip() {
-        // TODO: asta lmao
         clipServo.setPosition(0.2);
     }
 
     public static void closeClip() {
-        // TODO: asta lmao
         clipServo.setPosition(0.8);
     }
 

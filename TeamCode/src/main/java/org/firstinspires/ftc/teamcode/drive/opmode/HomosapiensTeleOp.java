@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * exercise is to ascertain whether the localizer has been configured properly (note: the pure
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
+@Config
 @TeleOp(name = "HomosapiensTeleOP", group = "testing")
 public class HomosapiensTeleOp extends LinearOpMode {
     public double SPEED_MULTIPLIER = 0.75;
@@ -54,11 +56,11 @@ public class HomosapiensTeleOp extends LinearOpMode {
             } else if (gamepad1.left_bumper) {
                 SPEED_MULTIPLIER = 0.4;
                 gamepad1.rumble(0.1, 0.1, 100);
-                gamepad1.rumble(0.1, 0.1, 100);
+//                gamepad1.rumble(0.1, 0.1, 100);
             } else if (gamepad1.right_bumper) {
                 SPEED_MULTIPLIER = 0.75;
                 gamepad1.rumble(0.6, 0.6, 200);
-                gamepad1.rumble(0.6, 0.6, 200);
+//                gamepad1.rumble(0.6, 0.6, 200);
             } else if (gamepad1.circle) {
                 ArmControl.setArmPower(0.8);
                 telemetry.addData("Arm go", "up");

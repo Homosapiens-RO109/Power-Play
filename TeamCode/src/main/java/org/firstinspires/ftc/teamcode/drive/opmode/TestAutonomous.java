@@ -27,21 +27,27 @@ public class TestAutonomous extends LinearOpMode {
         TrajectoryVelocityConstraint slowVel = SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH);
         TrajectoryAccelerationConstraint slowAcc = SampleMecanumDrive.getAccelerationConstraint(15);
 
-        TrajectorySequence incercare1 =         drive.trajectorySequenceBuilder(new Pose2d(-36.78, -64.81, Math.toRadians(90.00)))
-                .forward(5)
-                .strafeRight(24)
-                .forward(48)
-                .strafeLeft(10.8)
-//                .lineTo(new Vector2d(-36.78, -57.80))
-//                .lineTo(new Vector2d(-12.63, -57.25))
-//                .lineTo(new Vector2d(-12.63, -9.86))
-//                .lineTo(new Vector2d(-24.00, -9.13))
+//        TrajectorySequence incercare1 = drive.trajectorySequenceBuilder(new Pose2d(-36.78, -64.81, Math.toRadians(90.00)))
+//                .forward(5)
+//                .strafeRight(24)
+//                .forward(48)
+//                .strafeLeft(10.8)
+//                .build();
+
+        TrajectorySequence incercare1 = drive.trajectorySequenceBuilder(new Pose2d(-36.05, -64.07, Math.toRadians(90.00)))
+                .splineTo(new Vector2d(-35.31, -19.27), Math.toRadians(90.00))
+                .lineTo(new Vector2d(-24.00, -8.25))
                 .build();
 
 //        drive.trajectorySequenceBuilder(new Pose2d(-36.05, -64.62, Math.toRadians(90.00)))
 //                .lineToSplineHeading(new Pose2d(-36.23, -14.47, Math.toRadians(90.00)))
 //                .lineToSplineHeading(new Pose2d(-23.88, -8.94, Math.toRadians(90.00)))
 //                .build();
+
+//                .lineTo(new Vector2d(-36.78, -57.80))
+//                .lineTo(new Vector2d(-12.63, -57.25))
+//                .lineTo(new Vector2d(-12.63, -9.86))
+//                .lineTo(new Vector2d(-24.00, -9.13))
 
 
         drive.setPoseEstimate(incercare1.start());

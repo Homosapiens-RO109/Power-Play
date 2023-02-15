@@ -110,6 +110,7 @@ public class LynxModuleUtil {
         }
         if (outdatedModules.size() > 0) {
             StringBuilder msgBuilder = new StringBuilder();
+            msgBuilder.append("The warning below is probably wrong. The Lynx modules (ie: Expansion Hub) aren't all connected.");
             msgBuilder.append("One or more of the attached Lynx modules has outdated firmware\n");
             msgBuilder.append(Misc.formatInvariant("Mandatory minimum firmware version for Road Runner: %s\n",
                     MIN_VERSION.toString()));

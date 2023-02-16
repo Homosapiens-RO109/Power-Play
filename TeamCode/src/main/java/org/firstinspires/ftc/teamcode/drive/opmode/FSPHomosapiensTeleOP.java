@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -22,9 +21,9 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @Config
-@TeleOp(name = "FSM - TeleOP", group = "fsm")
-public class FsmHomo extends LinearOpMode {
     public double SPEED_MULTIPLIER = 0.75;
+@TeleOp(name = "Homosapiens TeleOP FSM", group = "fsm")
+public class FSPHomosapiensTeleOP extends LinearOpMode {
 
     public boolean[] keyPressArray = new boolean[69]; // macar asta sa fie nice
 
@@ -81,7 +80,6 @@ public class FsmHomo extends LinearOpMode {
         } else if (keyPressArray[KEYS.DPAD_RIGHT.value]) {
             ArmControl.setArmLevel(ArmControl.Levels.THIRD);
         }
-        // todo log this shit to telemetry
     }
 
     public void handleDrive(SampleMecanumDrive drive, boolean isBalan) {

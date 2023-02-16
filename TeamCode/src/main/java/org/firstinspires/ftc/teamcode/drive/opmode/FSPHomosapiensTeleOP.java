@@ -21,9 +21,9 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @Config
-    public double SPEED_MULTIPLIER = 0.75;
 @TeleOp(name = "Homosapiens TeleOP FSM", group = "fsm")
 public class FSPHomosapiensTeleOP extends LinearOpMode {
+    public double SPEED_MULTIPLIER = 0.5;
 
     public boolean[] keyPressArray = new boolean[69]; // macar asta sa fie nice
 

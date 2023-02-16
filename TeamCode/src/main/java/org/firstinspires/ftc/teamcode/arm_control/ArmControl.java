@@ -20,7 +20,7 @@ public class ArmControl {
     private static Telemetry telemetry = null;
 
     // 30, 1277, 2035, 2889
-    private static final List<Integer> armMotorLevels = Arrays.asList(30, 1300, 2100, 2920);
+    private static final List<Integer> armMotorLevels = Arrays.asList(3, 1300, 2100, 2920);
 
     private static final double ARM_MOTOR_POWER_UP = 0.85;
     private static final double ARM_MOTOR_POWER_DOWN = 0.75;

@@ -71,7 +71,9 @@ public class HomosapiensTeleOp extends LinearOpMode {
 //                ArmControl.setArmPower(0.0);
 //                telemetry.addData("Arm go", "no go");
 //            }
-            } else if (gamepad1.dpad_left) {
+            }
+
+            if (gamepad1.dpad_left) {
                 ArmControl.setArmLevel(ArmControl.Levels.FIRST);
             } else if (gamepad1.dpad_up) {
                 ArmControl.setArmLevel(ArmControl.Levels.SECOND);

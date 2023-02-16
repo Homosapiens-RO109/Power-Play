@@ -62,7 +62,7 @@ public class StangaConParcare extends LinearOpMode {
 
                     if (tag.id == FIRST_ID_TAG_OF_INTEREST || tag.id == SECOND_ID_TAG_OF_INTEREST || tag.id == THIRD_ID_TAG_OF_INTEREST) {
                         tagOfInterest = tag;
-                        t.addData("Tag", tagOfInterest.id);
+                        t.addData("Relevant tag", tagOfInterest.id);
                         t.update();
                         return tagOfInterest.id;
                     }
@@ -70,7 +70,7 @@ public class StangaConParcare extends LinearOpMode {
             }
             t.update();
         }
-        return -1;
+        return SECOND_ID_TAG_OF_INTEREST;
     }
 
     @Override
@@ -185,7 +185,7 @@ public class StangaConParcare extends LinearOpMode {
             ArmControl.setArmLevel(ArmControl.Levels.FIRST);
 //            TODO: uncomment these once testing is done
             drive.followTrajectorySequence(putPreload);
-            if (aprilTag[0] != 2) { // O mica romaneasca
+            if (aprilTag[0] != SECOND_ID_TAG_OF_INTEREST) { // O mica romaneasca
                 drive.followTrajectorySequence(park);
             }
         }

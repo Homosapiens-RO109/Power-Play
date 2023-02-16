@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Config
-@Autonomous(group = "redparcare", name = "Rosu Parcare Stanga")
-public class RosuStanga extends LinearOpMode {
+@Autonomous(group = "left", name = "Partea Stanga Con + Parcare")
+public class StangaConParcare extends LinearOpMode {
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -45,9 +45,9 @@ public class RosuStanga extends LinearOpMode {
     // UNITS ARE METERS
     double tagsize = 0.166;
 
-    final int FIRST_ID_TAG_OF_INTEREST = 1; // 36h11 family
-    final int SECOND_ID_TAG_OF_INTEREST = 0;
-    final int THIRD_ID_TAG_OF_INTEREST = 9;
+    final int FIRST_ID_TAG_OF_INTEREST = 0; // 36h11 family
+    final int SECOND_ID_TAG_OF_INTEREST = 1;
+    final int THIRD_ID_TAG_OF_INTEREST = 2;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -63,8 +63,7 @@ public class RosuStanga extends LinearOpMode {
                     if (tag.id == FIRST_ID_TAG_OF_INTEREST || tag.id == SECOND_ID_TAG_OF_INTEREST || tag.id == THIRD_ID_TAG_OF_INTEREST) {
                         tagOfInterest = tag;
                         t.addData("Tag", tagOfInterest.id);
-                        t.update(); // It only took us 20 minutes!
-                                    // That was a lie!
+                        t.update();
                         return tagOfInterest.id;
                     }
                 }
@@ -112,32 +111,60 @@ public class RosuStanga extends LinearOpMode {
         final long startTime = new Date().getTime();
 
         TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(-35.40, -65.50, Math.toRadians(90.00)))
-                .UNSTABLE_addTemporalMarkerOffset(3.06,() -> {
+//                .UNSTABLE_addTemporalMarkerOffset(3.06,() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
+//                })
+//                .UNSTABLE_addTemporalMarkerOffset(4.00,() -> {
+//                    ArmControl.openClip();
+//                })
+//                .UNSTABLE_addTemporalMarkerOffset(4.40,() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+//                })
+                .lineToSplineHeading(new Pose2d(-11.61, -59.92, Math.toRadians(90.00))) // first strafe
+                .lineToSplineHeading(new Pose2d(-11.43, -12.36, Math.toRadians(90.00))) // goes forward
+                .addDisplacementMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.THIRD);
                 })
-                .UNSTABLE_addTemporalMarkerOffset(4.00,() -> {
+                .lineToSplineHeading(new Pose2d(-24.4, -8.4, Math.toRadians(90.00))) // strafes left to get to the JB
+                .waitSeconds(0.8)
+                .addTemporalMarker(() -> {
                     ArmControl.openClip();
+                })
+                .waitSeconds(0.8)
+                .lineToSplineHeading(new Pose2d(-36.14, -19.42, Math.toRadians(90.00))) // goes more left
+                .addDisplacementMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.DOWN);
                 })
-                .lineToSplineHeading(new Pose2d(-11.61, -59.92, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(-11.43, -12.36, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(-23.50, -8.64, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))) // goes backwards in the middle lane
                 .build();
         drive.setPoseEstimate(putPreload.start());
 
+        TrajectorySequence park = null;
+
         switch (aprilTag[0]) {
             case FIRST_ID_TAG_OF_INTEREST: {
-                // TODO: Code here
+                // you strafe left
+                park = drive.trajectorySequenceBuilder(putPreload.end())
+                        .lineToSplineHeading(new Pose2d(-61.31, -36.60, Math.toRadians(90.00)))
+                        .build();
                 break;
             }
-            case SECOND_ID_TAG_OF_INTEREST: {
-                // TODO: More code here
-                int sugiPula = 69;
-                break;
-            }
+//            This in theory should go straight to default and do nothing
+//            case SECOND_ID_TAG_OF_INTEREST: {
+//                // You do nothing
+//                park = drive.trajectorySequenceBuilder(putPreload.end()).build();
+//                break;
+//            }
             case THIRD_ID_TAG_OF_INTEREST: {
-                // TODO: Even more code here
-                int inteliSense = 0;
+                // You strafe right
+                park = drive.trajectorySequenceBuilder(putPreload.end())
+                        .lineToSplineHeading(new Pose2d(-11.71, -36.41, Math.toRadians(90.00)))
+                        .build();
+                break;
+            }
+            default: {
+                // You do nothing
+                park = drive.trajectorySequenceBuilder(putPreload.end()).build();
                 break;
             }
         }
@@ -155,11 +182,27 @@ public class RosuStanga extends LinearOpMode {
 
         if (!isStopRequested()) {
             ArmControl.closeClip();
-            ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+            ArmControl.setArmLevel(ArmControl.Levels.FIRST);
+//            TODO: uncomment these once testing is done
             drive.followTrajectorySequence(putPreload);
+            if (aprilTag[0] != 2) { // O mica romaneasca
+                drive.followTrajectorySequence(park);
+            }
         }
     }
 }
+
+//        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(new Pose2d(-36.14, -19.42, Math.toRadians(90.00)))
+//                .UNSTABLE_addTemporalMarkerOffset(1.47,() -> {})
+//                .UNSTABLE_addTemporalMarkerOffset(3.96,() -> {})
+//                .UNSTABLE_addTemporalMarkerOffset(3.12,() -> {})
+//
+//                .splineTo(new Vector2d(-60.20, -12.63), Math.toRadians(180.00))
+//                .lineTo(new Vector2d(-23.69, -9.86))
+//                .lineTo(new Vector2d(-36.41, -9.86))
+//                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(87.75)))
+//                .build();
+
 
 //            t = drive.trajectorySequenceBuilder(new Pose2d(-36.05, -64.62, Math.toRadians(90.00)))
 //                    .addTemporalMarker(() -> {

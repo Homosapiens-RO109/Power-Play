@@ -97,7 +97,7 @@ public class DreaptaConParcare extends LinearOpMode {
             public void onOpened() { // old:800 x 448
                 camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
                 FtcDashboard.getInstance().startCameraStream(camera, 0);
-                aprilTag[0] = aprilTagMagic(telemetry);
+//                aprilTag[0] = aprilTagMagic(telemetry);
             }
 
             @Override
@@ -105,8 +105,17 @@ public class DreaptaConParcare extends LinearOpMode {
 
             }
         });
+
+        waitForStart();
+
         final long sightStartSeeing = new Date().getTime();
-        aprilTag[0] = aprilTagMagic(telemetry);
+        try {
+            aprilTag[0] = aprilTagMagic(telemetry);
+        } catch (Exception e) {
+            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+            telemetry.addLine("Failed to set proper tag :(");
+            telemetry.addLine("Defaulted to middle choice");
+        }
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
         final long startTime = new Date().getTime();
 

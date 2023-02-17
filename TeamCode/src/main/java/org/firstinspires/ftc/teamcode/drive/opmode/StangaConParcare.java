@@ -105,8 +105,17 @@ public class StangaConParcare extends LinearOpMode {
 
             }
         });
+
+        waitForStart();
+
         final long sightStartSeeing = new Date().getTime();
-        aprilTag[0] = aprilTagMagic(telemetry);
+        try {
+            aprilTag[0] = aprilTagMagic(telemetry);
+        } catch (Exception e) {
+            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+            telemetry.addLine("Failed to set proper tag :(");
+            telemetry.addLine("Defaulted to middle choice");
+        }
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
         final long startTime = new Date().getTime();
 

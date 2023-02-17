@@ -62,8 +62,7 @@ public class FSPHomosapiensTeleOP extends LinearOpMode {
     public void handleClipControls() {
         if (keyPressArray[KEYS.SQUARE.value]) {
             ArmControl.openClip();
-        }
-        else if (keyPressArray[KEYS.TRIANGLE.value]) {
+        } else if (keyPressArray[KEYS.TRIANGLE.value]) {
             ArmControl.closeClip();
         }
 

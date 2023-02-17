@@ -43,11 +43,11 @@ public class DreaptaConParcare extends LinearOpMode {
     double cy = 248.997;
 
     // UNITS ARE METERS
-    double tagsize = 0.166;
+    double tagsize = 0.035;
 
-    final int FIRST_ID_TAG_OF_INTEREST = 0; // 36h11 family
-    final int SECOND_ID_TAG_OF_INTEREST = 1;
-    final int THIRD_ID_TAG_OF_INTEREST = 2;
+    final int FIRST_ID_TAG_OF_INTEREST = 1; // 36h11 family
+    final int SECOND_ID_TAG_OF_INTEREST = 2;
+    final int THIRD_ID_TAG_OF_INTEREST = 0;
 
     AprilTagDetection tagOfInterest = null;
 

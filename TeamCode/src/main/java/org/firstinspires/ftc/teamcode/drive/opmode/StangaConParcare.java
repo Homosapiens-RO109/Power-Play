@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Config
-@Autonomous(group = "left", name = "Partea Stanga Con + Parcare")
+@Autonomous(group = "left", name = "Partea Stanga Con + Parcare", preselectTeleOp = "Homosapiens TeleOP FSM")
 public class StangaConParcare extends LinearOpMode {
 
     OpenCvCamera camera;

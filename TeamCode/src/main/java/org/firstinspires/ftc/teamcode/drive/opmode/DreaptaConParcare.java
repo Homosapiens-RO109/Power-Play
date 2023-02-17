@@ -125,7 +125,7 @@ public class DreaptaConParcare extends LinearOpMode {
                 .addDisplacementMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.THIRD);
                 })
-                .lineToSplineHeading(new Pose2d(24.06, -8.27, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(24.30, -8.27, Math.toRadians(90.00)))
                 .waitSeconds(0.8)
                 .addTemporalMarker(() -> {
                     ArmControl.openClip();
@@ -146,26 +146,26 @@ public class DreaptaConParcare extends LinearOpMode {
             case FIRST_ID_TAG_OF_INTEREST: {
                 // you strafe left
                 park = drive.trajectorySequenceBuilder(putPreload.end())
-                        .lineToSplineHeading(new Pose2d(-61.31, -36.60, Math.toRadians(90.00)))
+                        .lineToSplineHeading(new Pose2d(10.47, -36.60, Math.toRadians(90.00)))
                         .build();
                 break;
             }
 //            This in theory should go straight to default and do nothing
-//            case SECOND_ID_TAG_OF_INTEREST: {
-//                // You do nothing
-//                park = drive.trajectorySequenceBuilder(putPreload.end()).build();
-//                break;
-//            }
+            case SECOND_ID_TAG_OF_INTEREST: {
+                // You do nothing
+                park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.1).build();
+                break;
+            }
             case THIRD_ID_TAG_OF_INTEREST: {
                 // You strafe right
                 park = drive.trajectorySequenceBuilder(putPreload.end())
-                        .lineToSplineHeading(new Pose2d(-11.71, -36.41, Math.toRadians(90.00)))
+                        .lineToSplineHeading(new Pose2d(61.62, -36.41, Math.toRadians(90.00)))
                         .build();
                 break;
             }
             default: {
                 // You do nothing
-                park = drive.trajectorySequenceBuilder(putPreload.end()).build();
+                park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.01).build();
                 break;
             }
         }
@@ -179,12 +179,10 @@ public class DreaptaConParcare extends LinearOpMode {
         telemetry.addData("Created path in (ms)", secondsTillParsed);
         telemetry.update();
 
-        waitForStart();
-
         if (!isStopRequested()) {
             ArmControl.closeClip();
             ArmControl.setArmLevel(ArmControl.Levels.FIRST);
-//            TODO: uncomment these once testing is done
+//          TODO: uncomment these once testing is done
             drive.followTrajectorySequence(putPreload);
             if (aprilTag[0] != SECOND_ID_TAG_OF_INTEREST) { // O mica romaneasca
                 drive.followTrajectorySequence(park);

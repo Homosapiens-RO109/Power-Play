@@ -97,7 +97,6 @@ public class StangaConParcare extends LinearOpMode {
             public void onOpened() { // old:800 x 448
                 camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
                 FtcDashboard.getInstance().startCameraStream(camera, 0);
-                aprilTag[0] = aprilTagMagic(telemetry);
             }
 
             @Override
@@ -120,15 +119,6 @@ public class StangaConParcare extends LinearOpMode {
         final long startTime = new Date().getTime();
 
         TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(-35.40, -65.50, Math.toRadians(90.00)))
-//                .UNSTABLE_addTemporalMarkerOffset(3.06,() -> {
-//                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
-//                })
-//                .UNSTABLE_addTemporalMarkerOffset(4.00,() -> {
-//                    ArmControl.openClip();
-//                })
-//                .UNSTABLE_addTemporalMarkerOffset(4.40,() -> {
-//                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
-//                })
                 .lineToSplineHeading(new Pose2d(-11.61, -59.92, Math.toRadians(90.00))) // first strafe
                 .lineToSplineHeading(new Pose2d(-11.43, -12.36, Math.toRadians(90.00))) // goes forward
                 .addDisplacementMarker(() -> {
@@ -159,11 +149,11 @@ public class StangaConParcare extends LinearOpMode {
                 break;
             }
 //            This in theory should go straight to default and do nothing
-//            case SECOND_ID_TAG_OF_INTEREST: {
-//                // You do nothing
-//                park = drive.trajectorySequenceBuilder(putPreload.end()).build();
-//                break;
-//            }
+            case SECOND_ID_TAG_OF_INTEREST: {
+                // You do nothing
+                park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.1).build();
+                break;
+            }
             case THIRD_ID_TAG_OF_INTEREST: {
                 // You strafe right
                 park = drive.trajectorySequenceBuilder(putPreload.end())
@@ -173,7 +163,7 @@ public class StangaConParcare extends LinearOpMode {
             }
             default: {
                 // You do nothing
-                park = drive.trajectorySequenceBuilder(putPreload.end()).build();
+                park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.01).build();
                 break;
             }
         }
@@ -192,11 +182,9 @@ public class StangaConParcare extends LinearOpMode {
         if (!isStopRequested()) {
             ArmControl.closeClip();
             ArmControl.setArmLevel(ArmControl.Levels.FIRST);
-//            TODO: uncomment these once testing is done
+//          TODO: uncomment these once testing is done
             drive.followTrajectorySequence(putPreload);
-            if (aprilTag[0] != SECOND_ID_TAG_OF_INTEREST) { // O mica romaneasca
-                drive.followTrajectorySequence(park);
-            }
+            drive.followTrajectorySequence(park);
         }
     }
 }

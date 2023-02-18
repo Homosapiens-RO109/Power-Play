@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.OpenCV.AprilTagDetectionPipeline;
 
@@ -52,6 +53,9 @@ public class StangaConParcare extends LinearOpMode {
     AprilTagDetection tagOfInterest = null;
 
     public int aprilTagMagic(Telemetry t) {
+        // TODO: fix this dumb ass shit
+        // the while will always just exit out and crash
+        // if it takes more than 10 seconds just exit and return 2;
         while (!isStarted() && !isStopRequested()) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
@@ -96,12 +100,13 @@ public class StangaConParcare extends LinearOpMode {
             @Override
             public void onOpened() { // old:800 x 448
                 camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
-                FtcDashboard.getInstance().startCameraStream(camera, 0);
+//                FtcDashboard.getInstance().startCameraStream(camera, 0);#
+                telemetry.addLine("Camera is up.");
             }
 
             @Override
             public void onError(int errorCode) {
-
+                telemetry.addData("Camera has errored with code.", errorCode);
             }
         });
 
@@ -116,9 +121,11 @@ public class StangaConParcare extends LinearOpMode {
             telemetry.addLine("Defaulted to middle choice");
         }
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
+        telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
-        TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(-35.40, -65.50, Math.toRadians(90.00)))
+        Pose2d startPose = new Pose2d(-35.40, -65.50, Math.toRadians(90.00));
+        TrajectorySequenceBuilder putPreload = drive.trajectorySequenceBuilder(new Pose2d(-35.40, -65.50, Math.toRadians(90.00)))
                 .lineToSplineHeading(new Pose2d(-11.61, -59.92, Math.toRadians(90.00))) // first strafe
                 .lineToSplineHeading(new Pose2d(-11.43, -12.36, Math.toRadians(90.00))) // goes forward
                 .addDisplacementMarker(() -> {
@@ -134,16 +141,17 @@ public class StangaConParcare extends LinearOpMode {
                 .addDisplacementMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.DOWN);
                 })
-                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))) // goes backwards in the middle lane
-                .build();
-        drive.setPoseEstimate(putPreload.start());
+                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))); // goes backwards in the middle lane;
+        drive.setPoseEstimate(startPose);
+        Pose2d endPose = new Pose2d(-35.95, -36.51, Math.toRadians(90.00));
 
-        TrajectorySequence park = null;
+        TrajectorySequence finalPath = null;
 
         switch (aprilTag[0]) {
             case FIRST_ID_TAG_OF_INTEREST: {
                 // you strafe left
-                park = drive.trajectorySequenceBuilder(putPreload.end())
+//                park = drive.trajectorySequenceBuilder(putPreload.end())
+                finalPath = putPreload
                         .lineToSplineHeading(new Pose2d(-61.31, -36.60, Math.toRadians(90.00)))
                         .build();
                 break;
@@ -151,19 +159,19 @@ public class StangaConParcare extends LinearOpMode {
 //            This in theory should go straight to default and do nothing
             case SECOND_ID_TAG_OF_INTEREST: {
                 // You do nothing
-                park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.1).build();
+                finalPath = putPreload.forward(0.1).build();
                 break;
             }
             case THIRD_ID_TAG_OF_INTEREST: {
                 // You strafe right
-                park = drive.trajectorySequenceBuilder(putPreload.end())
+                finalPath = putPreload
                         .lineToSplineHeading(new Pose2d(-11.71, -36.41, Math.toRadians(90.00)))
                         .build();
                 break;
             }
             default: {
                 // You do nothing
-                park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.01).build();
+                finalPath = putPreload.forward(0.01).build();
                 break;
             }
         }
@@ -183,8 +191,9 @@ public class StangaConParcare extends LinearOpMode {
             ArmControl.closeClip();
             ArmControl.setArmLevel(ArmControl.Levels.FIRST);
 //          TODO: uncomment these once testing is done
-            drive.followTrajectorySequence(putPreload);
-            drive.followTrajectorySequence(park);
+//            drive.followTrajectorySequence(putPreload);
+//            drive.followTrajectorySequence(park);
+            drive.followTrajectorySequence(finalPath);
         }
     }
 }

@@ -22,12 +22,10 @@ public class MeepMeepTesting {
 //                                .lineTo(new Vector2d(-12.63, -9.86))
 //                                .lineTo(new Vector2d(-24.00, -9.13))
 //                                .build()
-                                drive.trajectorySequenceBuilder(new Pose2d(-36.78, -64.81, Math.toRadians(90.00)))
-                                        .forward(5)
-                                        .strafeRight(24)
-                                        .forward(48)
-                                        .strafeLeft(10.8)
-                                        .build()
+                        drive.trajectorySequenceBuilder(new Pose2d(-35.40, -65.50, Math.toRadians(90.00)))
+                                .forward(30)
+                                .strafeRight(25)
+                                .build()
                 );
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)

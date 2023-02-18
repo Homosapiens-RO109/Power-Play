@@ -96,7 +96,7 @@ public class DreaptaConParcare extends LinearOpMode {
             @Override
             public void onOpened() { // old:800 x 448
                 camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
-                FtcDashboard.getInstance().startCameraStream(camera, 0);
+//                FtcDashboard.getInstance().startCameraStream(camera, 0);
 //                aprilTag[0] = aprilTagMagic(telemetry);
             }
 
@@ -117,6 +117,7 @@ public class DreaptaConParcare extends LinearOpMode {
             telemetry.addLine("Defaulted to middle choice");
         }
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
+        telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
         TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(36.70, -65.31, Math.toRadians(90.00)))
@@ -145,6 +146,7 @@ public class DreaptaConParcare extends LinearOpMode {
         switch (aprilTag[0]) {
             case FIRST_ID_TAG_OF_INTEREST: {
                 // you strafe left
+                telemetry.addLine("Will strafe left");
                 park = drive.trajectorySequenceBuilder(putPreload.end())
                         .lineToSplineHeading(new Pose2d(10.47, -36.60, Math.toRadians(90.00)))
                         .build();
@@ -153,11 +155,13 @@ public class DreaptaConParcare extends LinearOpMode {
 //            This in theory should go straight to default and do nothing
             case SECOND_ID_TAG_OF_INTEREST: {
                 // You do nothing
+                telemetry.addLine("Will do nothing");
                 park = drive.trajectorySequenceBuilder(putPreload.end()).forward(0.1).build();
                 break;
             }
             case THIRD_ID_TAG_OF_INTEREST: {
                 // You strafe right
+                telemetry.addLine("Will strafe right");
                 park = drive.trajectorySequenceBuilder(putPreload.end())
                         .lineToSplineHeading(new Pose2d(61.62, -36.41, Math.toRadians(90.00)))
                         .build();

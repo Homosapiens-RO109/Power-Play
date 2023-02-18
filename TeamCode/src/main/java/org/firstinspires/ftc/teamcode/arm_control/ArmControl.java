@@ -54,9 +54,6 @@ public class ArmControl {
         armMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-//        armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         clipServo = hwm.get(Servo.class, "s_armclip"); // sau nu asa
 
         armMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -87,6 +84,18 @@ public class ArmControl {
         telemetry.addData("Arm power", currentArmPower);
 //        telemetry.update();
     }
+
+//    public static void runManually(double power) {
+//        armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        armMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//        if (armMotor1.getCurrentPosition() < -50 || armMotor2.getCurrentPosition() < -50) {
+//            armMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            armMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        }
+//
+//        setArmPower(power);
+//    }
 
     public static void setArmLevel(Levels level) {
 //        double finalPower = 0.0;

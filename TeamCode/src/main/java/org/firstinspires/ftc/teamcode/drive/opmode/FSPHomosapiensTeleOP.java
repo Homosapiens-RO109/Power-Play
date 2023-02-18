@@ -53,10 +53,10 @@ public class FSPHomosapiensTeleOP extends LinearOpMode {
         keyPressArray[KEYS.DPAD_RIGHT.value] = gp.dpad_right;
         keyPressArray[KEYS.LB.value] = gp.left_bumper;
         keyPressArray[KEYS.RB.value] = gp.right_bumper;
-        keyPressArray[KEYS.X.value] = gp.x;
         keyPressArray[KEYS.SQUARE.value] = gp.square;
         keyPressArray[KEYS.TRIANGLE.value] = gp.triangle;
         keyPressArray[KEYS.CIRCLE.value] = gp.circle;
+        keyPressArray[KEYS.X.value] = gp.x;
     }
 
     public void handleClipControls() {

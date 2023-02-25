@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Config
-@Autonomous(group = "parcare", name = "Parcare Con", preselectTeleOp = "Homosapiens TeleOP FSM")
-public class ParcareCon extends LinearOpMode {
+@Autonomous(group = "parcare", name = "Parcare Romaneasca", preselectTeleOp = "Homosapiens TeleOP FSM")
+public class AutonomieRomaneasca extends LinearOpMode {
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -69,7 +69,6 @@ public class ParcareCon extends LinearOpMode {
             t.update();
         }
         t.addLine("Had to use default tag");
-        t.update();
         return SECOND_ID_TAG_OF_INTEREST;
     }
 
@@ -119,38 +118,31 @@ public class ParcareCon extends LinearOpMode {
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
-        TrajectorySequence finalPath = null;
-
-        Pose2d startPose = new Pose2d(-35.40, -65.50, Math.toRadians(90.00));
-        TrajectorySequenceBuilder putPreload = drive.trajectorySequenceBuilder(startPose).forward(30);
-
-        drive.setPoseEstimate(startPose);
+        drive.setMotorPowers(0.5, 0.5, 0.5, 0.5);
+        sleep(1450);
 
         switch (aprilTag[0]) {
-            case FIRST_ID_TAG_OF_INTEREST: {
-                // you strafe left
-//                park = drive.trajectorySequenceBuilder(putPreload.end())
-                finalPath = putPreload
-                        .strafeLeft(25)
-                        .build();
+            case FIRST_ID_TAG_OF_INTEREST: {;
+                // You strafe left
+                // use weighted driving with mecanum wheels to strafe to the left for 0.5 seconds
+                drive.setMotorPowers(0, 0.5, 0.0, -0.5);
+                sleep(1000);
                 break;
             }
-//            This in theory should go straight to default and do nothing
             case SECOND_ID_TAG_OF_INTEREST: {
                 // You do nothing
-                finalPath = putPreload.build();
                 break;
             }
             case THIRD_ID_TAG_OF_INTEREST: {
                 // You strafe right
-                finalPath = putPreload
-                        .strafeRight(25)
-                        .build();
+                // use weighted driving with mecanum wheels to strafe to the right for 0.5 seconds
+                drive.setMotorPowers(0.5, 0.0, -0.5, 0.0);
+                sleep(1000);
+                // TODO
                 break;
             }
             default: {
-                // You do nothing
-                finalPath = putPreload.build();
+
                 break;
             }
         }
@@ -164,13 +156,10 @@ public class ParcareCon extends LinearOpMode {
         telemetry.addData("Created path in (ms)", secondsTillParsed);
         telemetry.update();
 
+        waitForStart();
+
         if (!isStopRequested()) {
             ArmControl.closeClip();
-//            ArmControl.setArmLevel(ArmControl.Levels.FIRST);
-//          TODO: uncomment these once testing is done
-//            drive.followTrajectorySequence(putPreload);
-//            drive.followTrajectorySequence(park);
-            drive.followTrajectorySequence(finalPath);
         }
     }
 }

@@ -23,6 +23,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -53,27 +54,28 @@ public class StangaConParcare extends LinearOpMode {
     AprilTagDetection tagOfInterest = null;
 
     public int aprilTagMagic(Telemetry t) {
-        // TODO: fix this dumb ass shit
-        // the while will always just exit out and crash
-        // if it takes more than 10 seconds just exit and return 2;
-        while (!isStarted() && !isStopRequested()) {
+        // This has been fixed.
+        Date startTime = new Date();
+        while (!isStopRequested() && (new Date().getTime() - startTime.getTime()) < 15_000) {
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
 
             t.addData("Found", currentDetections.size());
             if (currentDetections.size() != 0) {
                 for (AprilTagDetection tag : currentDetections) {
-                    t.addData(String.valueOf(tag.id), "FOUND");
-
                     if (tag.id == FIRST_ID_TAG_OF_INTEREST || tag.id == SECOND_ID_TAG_OF_INTEREST || tag.id == THIRD_ID_TAG_OF_INTEREST) {
-                        tagOfInterest = tag;
-                        t.addData("Relevant tag", tagOfInterest.id);
+                        t.addData("Relevant tag", tag.id);
                         t.update();
-                        return tagOfInterest.id;
+                        return tag.id;
+                    } else {
+                        t.addData("Found useless tag", String.valueOf(tag.id));
+                        t.update();
                     }
                 }
             }
             t.update();
         }
+        t.addLine("Had to use default tag");
+        t.update();
         return SECOND_ID_TAG_OF_INTEREST;
     }
 
@@ -100,7 +102,6 @@ public class StangaConParcare extends LinearOpMode {
             @Override
             public void onOpened() { // old:800 x 448
                 camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
-//                FtcDashboard.getInstance().startCameraStream(camera, 0);#
                 telemetry.addLine("Camera is up.");
             }
 
@@ -120,6 +121,12 @@ public class StangaConParcare extends LinearOpMode {
             telemetry.addLine("Failed to set proper tag :(");
             telemetry.addLine("Defaulted to middle choice");
         }
+
+        // format the following MS to a human readable format
+//        SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
+//        String parsed = sdf.format(new Date().getTime() - sightStartSeeing);
+
+        // TODO: eventually have this all nicely parsed out since I can't be arsed currently
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
@@ -190,9 +197,6 @@ public class StangaConParcare extends LinearOpMode {
         if (!isStopRequested()) {
             ArmControl.closeClip();
             ArmControl.setArmLevel(ArmControl.Levels.FIRST);
-//          TODO: uncomment these once testing is done
-//            drive.followTrajectorySequence(putPreload);
-//            drive.followTrajectorySequence(park);
             drive.followTrajectorySequence(finalPath);
         }
     }

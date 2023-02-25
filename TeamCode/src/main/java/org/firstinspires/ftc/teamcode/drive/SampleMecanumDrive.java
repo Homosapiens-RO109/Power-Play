@@ -21,7 +21,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -58,7 +57,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1.43773;
+    public static double LATERAL_MULTIPLIER = 1;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -77,6 +76,9 @@ public class SampleMecanumDrive extends MecanumDrive {
     private IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
+    private List<Integer> lastEncPositions = new ArrayList<>();
+    private List<Integer> lastEncVels = new ArrayList<>();
+
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
@@ -91,22 +93,16 @@ public class SampleMecanumDrive extends MecanumDrive {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-//        // TODO: adjust the names of the following hardware devices to match your configuration
-//        imu = hardwareMap.get(IMU.class, "imu");
-//        // TODO: Adjust the orientations here to match your robot. See the FTC SDK documentation for
-//        // details
-//        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-//                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-//                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
-//        imu.initialize(parameters);
+        // TODO: adjust the names of the following hardware devices to match your configuration
+        imu = hardwareMap.get(IMU.class, "imu");
+        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+                DriveConstants.LOGO_FACING_DIR, DriveConstants.USB_FACING_DIR));
+        imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "m_frontleft");
-        leftRear = hardwareMap.get(DcMotorEx.class, "m_backleft");
-        rightRear = hardwareMap.get(DcMotorEx.class, "m_backright");
-        rightFront = hardwareMap.get(DcMotorEx.class, "m_frontright");
-
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -128,12 +124,16 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: reverse any motors using DcMotor.setDirection()
 
+        List<Integer> lastTrackingEncPositions = new ArrayList<>();
+        List<Integer> lastTrackingEncVels = new ArrayList<>();
+
         // TODO: if desired, use setLocalizer() to change the localization method
-        // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
+        // setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap, lastTrackingEncPositions, lastTrackingEncVels));
 
-        setLocalizer(new StandardTrackingWheelLocalizer(hardwareMap));
-
-        trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+        trajectorySequenceRunner = new TrajectorySequenceRunner(
+                follower, HEADING_PID, batteryVoltageSensor,
+                lastEncPositions, lastEncVels, lastTrackingEncPositions, lastTrackingEncVels
+        );
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
@@ -256,18 +256,26 @@ public class SampleMecanumDrive extends MecanumDrive {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
+        lastEncPositions.clear();
+
         List<Double> wheelPositions = new ArrayList<>();
         for (DcMotorEx motor : motors) {
-            wheelPositions.add(encoderTicksToInches(motor.getCurrentPosition()));
+            int position = motor.getCurrentPosition();
+            lastEncPositions.add(position);
+            wheelPositions.add(encoderTicksToInches(position));
         }
         return wheelPositions;
     }
 
     @Override
     public List<Double> getWheelVelocities() {
+        lastEncVels.clear();
+
         List<Double> wheelVelocities = new ArrayList<>();
         for (DcMotorEx motor : motors) {
-            wheelVelocities.add(encoderTicksToInches(motor.getVelocity()));
+            int vel = (int) motor.getVelocity();
+            lastEncVels.add(vel);
+            wheelVelocities.add(encoderTicksToInches(vel));
         }
         return wheelVelocities;
     }
@@ -282,12 +290,12 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public double getRawExternalHeading() {
-        return 0; //imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return 0.0; //(double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
+        return (double) imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {

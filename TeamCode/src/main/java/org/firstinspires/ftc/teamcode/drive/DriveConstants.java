@@ -36,14 +36,6 @@ public class DriveConstants {
     public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(0, 0, 0,
             getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV));
 
-    /*
-     * These are physical constants that can be determined from your robot (including the track
-     * width; it will be tune empirically later although a rough estimate is important). Users are
-     * free to chose whichever linear distance unit they would like so long as it is consistently
-     * used. The default values were selected with inches in mind. Road runner uses radians for
-     * angular distances although most angular parameters are wrapped in Math.toRadians() for
-     * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
-     */
     public static double WHEEL_RADIUS = 1.889; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
     public static double TRACK_WIDTH = 15.40; // in

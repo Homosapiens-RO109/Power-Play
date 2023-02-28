@@ -107,20 +107,22 @@ public class AutonomieRomaneasca extends LinearOpMode {
         waitForStart();
 
         final long sightStartSeeing = new Date().getTime();
-        try {
-            aprilTag[0] = aprilTagMagic(telemetry);
-        } catch (Exception e) {
-            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
-            telemetry.addLine("Failed to set proper tag :(");
-            telemetry.addLine("Defaulted to middle choice");
-        }
+//        try {
+//            aprilTag[0] = aprilTagMagic(telemetry);
+//        } catch (Exception e) {
+//            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+//            telemetry.addLine("Failed to set proper tag :(");
+//            telemetry.addLine("Defaulted to middle choice");
+//        }
+        aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
-        drive.setMotorPowers(0.5, 0.5, 0.5, 0.5);
-        sleep(1450);
-
+        drive.setMotorPowers(0.85, 0.85, 0.85, 0.85);
+        sleep(5000);
+        drive.setMotorPowers(0.0, 0.0, 0.0, 0.0);
+        sleep(90000);
         switch (aprilTag[0]) {
             case FIRST_ID_TAG_OF_INTEREST: {;
                 // You strafe left

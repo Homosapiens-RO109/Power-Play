@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
 @Config
-@Disabled
+//@Disabled
 @TeleOp(name = "HomosapiensTeleOPTest", group = "testing")
 public class HomosapiensTeleOpTest extends LinearOpMode {
     public double SPEED_MULTIPLIER = 0.75;

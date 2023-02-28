@@ -114,13 +114,15 @@ public class StangaConParcare extends LinearOpMode {
         waitForStart();
 
         final long sightStartSeeing = new Date().getTime();
-        try {
-            aprilTag[0] = aprilTagMagic(telemetry);
-        } catch (Exception e) {
-            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
-            telemetry.addLine("Failed to set proper tag :(");
-            telemetry.addLine("Defaulted to middle choice");
-        }
+//        try {
+//            aprilTag[0] = aprilTagMagic(telemetry);
+//        } catch (Exception e) {
+//            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+//            telemetry.addLine("Failed to set proper tag :(");
+//            telemetry.addLine("Defaulted to middle choice");
+//        }
+
+        aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
 
         // format the following MS to a human readable format
 //        SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
@@ -144,44 +146,46 @@ public class StangaConParcare extends LinearOpMode {
                     ArmControl.openClip();
                 })
                 .waitSeconds(0.8)
-                .lineToSplineHeading(new Pose2d(-36.14, -19.42, Math.toRadians(90.00))) // goes more left
+//                .lineToSplineHeading(new Pose2d(-36.14, -19.42, Math.toRadians(90.00))) // goes more left
                 .addDisplacementMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.DOWN);
-                })
-                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))); // goes backwards in the middle lane;
+                });
+//                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))); // goes backwards in the middle lane;
         drive.setPoseEstimate(startPose);
         Pose2d endPose = new Pose2d(-35.95, -36.51, Math.toRadians(90.00));
 
         TrajectorySequence finalPath = null;
 
-        switch (aprilTag[0]) {
-            case FIRST_ID_TAG_OF_INTEREST: {
-                // you strafe left
-//                park = drive.trajectorySequenceBuilder(putPreload.end())
-                finalPath = putPreload
-                        .lineToSplineHeading(new Pose2d(-61.31, -36.60, Math.toRadians(90.00)))
-                        .build();
-                break;
-            }
-//            This in theory should go straight to default and do nothing
-            case SECOND_ID_TAG_OF_INTEREST: {
-                // You do nothing
-                finalPath = putPreload.forward(0.1).build();
-                break;
-            }
-            case THIRD_ID_TAG_OF_INTEREST: {
-                // You strafe right
-                finalPath = putPreload
-                        .lineToSplineHeading(new Pose2d(-11.71, -36.41, Math.toRadians(90.00)))
-                        .build();
-                break;
-            }
-            default: {
-                // You do nothing
-                finalPath = putPreload.forward(0.01).build();
-                break;
-            }
-        }
+//        switch (aprilTag[0]) {
+//            case FIRST_ID_TAG_OF_INTEREST: {
+//                // you strafe left
+////                park = drive.trajectorySequenceBuilder(putPreload.end())
+//                finalPath = putPreload
+//                        .lineToSplineHeading(new Pose2d(-61.31, -36.60, Math.toRadians(90.00)))
+//                        .build();
+//                break;
+//            }
+////            This in theory should go straight to default and do nothing
+//            case SECOND_ID_TAG_OF_INTEREST: {
+//                // You do nothing
+//                finalPath = putPreload.forward(0.1).build();
+//                break;
+//            }
+//            case THIRD_ID_TAG_OF_INTEREST: {
+//                // You strafe right
+//                finalPath = putPreload
+//                        .lineToSplineHeading(new Pose2d(-11.71, -36.41, Math.toRadians(90.00)))
+//                        .build();
+//                break;
+//            }
+//            default: {
+//                // You do nothing
+//                finalPath = putPreload.forward(0.01).build();
+//                break;
+//            }
+//        }
+
+        finalPath = putPreload.build();
 
         long secondsTillParsed = new Date().getTime() - startTime;
 

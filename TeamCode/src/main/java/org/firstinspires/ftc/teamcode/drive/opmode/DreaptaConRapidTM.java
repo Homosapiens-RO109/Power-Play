@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.openftc.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.teamcode.OpenCV.AprilTagDetectionPipeline;
 
@@ -23,19 +22,18 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 @Config
-@Autonomous(group = "left", name = "Partea Stanga Con + Parcare", preselectTeleOp = "Homosapiens TeleOP FSM")
-public class StangaConParcare extends LinearOpMode {
+@Autonomous(group = "right", name = "Partea Dreapta Con + Parcare + Viteza TM", preselectTeleOp = "Homosapiens TeleOP FSM")
+public class DreaptaConRapidTM extends LinearOpMode {
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
 
     static final double FEET_PER_METER = 3.28084;
-//    double fx = 578.272;
+    //    double fx = 578.272;
 //    double fy = 578.272;
 //    double cx = 402.145;
 //    double cy = 221.506;
@@ -136,21 +134,21 @@ public class StangaConParcare extends LinearOpMode {
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
-        TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(-35, -65.87, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(-12.91, -55.09, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(-13.29, -16.07, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(-23.88, -14.96, Math.toRadians(90.00)))
+        TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(35, -65.87, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(12.91, -55.09, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(13.29, -16.07, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(23.88, -14.96, Math.toRadians(90.00)))
                 .addTemporalMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.THIRD);
                 })
                 .waitSeconds(1.0)
-                .lineToSplineHeading(new Pose2d(-24.25, -7.15, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
                 .waitSeconds(0.2)
                 .addTemporalMarker(() -> {
                     ArmControl.openClip();
                 })
                 .waitSeconds(0.4)
-                .lineToSplineHeading(new Pose2d(-23.88, -12.54, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
                 .addTemporalMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
                 })
@@ -159,9 +157,9 @@ public class StangaConParcare extends LinearOpMode {
 
         TrajectorySequence takeCone = drive.trajectorySequenceBuilder(putPreload.end())
                 .back(2.0)
-                .turn(Math.toRadians(90))
-                .lineToSplineHeading(new Pose2d(-37.34, -13.00, Math.toRadians(180.00)))
-                .lineToSplineHeading(new Pose2d(-65.00, -12.81, Math.toRadians(180.00)))
+                .turn(-Math.toRadians(90))
+                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
+                .lineToSplineHeading(new Pose2d(65.00, -12.81, Math.toRadians(0.00)))
                 .waitSeconds(0.8)
                 .addTemporalMarker(() -> {
                     ArmControl.closeClip();
@@ -174,14 +172,14 @@ public class StangaConParcare extends LinearOpMode {
                 .build();
 
         TrajectorySequence putCone = drive.trajectorySequenceBuilder(takeCone.end())
-                .lineToSplineHeading(new Pose2d(-37.34, -13.00, Math.toRadians(180.00)))
-                .turn(-Math.toRadians(90))
-                .lineToSplineHeading(new Pose2d(-23.88, -12.54, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
+                .turn(Math.toRadians(90))
+                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
                 .addTemporalMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.THIRD);
                 })
                 .waitSeconds(1.0)
-                .lineToSplineHeading(new Pose2d(-24.25, -7.15, Math.toRadians(90.00)))
+                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
                 .waitSeconds(0.5)
                 .addTemporalMarker(() -> {
                     ArmControl.openClip();
@@ -213,29 +211,6 @@ public class StangaConParcare extends LinearOpMode {
         }
     }
 }
-
-//    TrajectorySequence finalPath = null;
-//        switch (aprilTag[0]) {
-//                case FIRST_ID_TAG_OF_INTEREST: {
-//                // You strafe left
-//                finalPath = putPreload
-//                .lineToSplineHeading(new Pose2d(-61.31, -36.60, Math.toRadians(90.00)))
-//                .build();
-//                break;
-//                }
-//                case THIRD_ID_TAG_OF_INTEREST: {
-//                // You strafe right
-//                finalPath = putPreload
-//                .lineToSplineHeading(new Pose2d(-11.71, -36.41, Math.toRadians(90.00)))
-//                .build();
-//                break;
-//                }
-//default: {
-//        // You do nothing
-//        finalPath = putPreload.build();
-//        break;
-//        }
-//        }
 
 //        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(new Pose2d(-36.14, -19.42, Math.toRadians(90.00)))
 //                .UNSTABLE_addTemporalMarkerOffset(1.47,() -> {})
@@ -340,8 +315,16 @@ public class StangaConParcare extends LinearOpMode {
         }
 * */
 
-
-//        TrajectorySequenceBuilder putPreload = drive.trajectorySequenceBuilder(new Pose2d(-35.40, -65.50, Math.toRadians(90.00)))
+/*
+* //                .UNSTABLE_addTemporalMarkerOffset(3.06,() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
+//                })
+//                .UNSTABLE_addTemporalMarkerOffset(4.00,() -> {
+//                    ArmControl.openClip();
+//                })
+//                .UNSTABLE_addTemporalMarkerOffset(4.40,() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+//                })
 //                .lineToSplineHeading(new Pose2d(-11.61, -59.92, Math.toRadians(90.00))) // first strafe
 //                .lineToSplineHeading(new Pose2d(-11.43, -12.36, Math.toRadians(90.00))) // goes forward
 //                .addDisplacementMarker(() -> {
@@ -353,8 +336,9 @@ public class StangaConParcare extends LinearOpMode {
 //                    ArmControl.openClip();
 //                })
 //                .waitSeconds(0.8)
-////                .lineToSplineHeading(new Pose2d(-36.14, -19.42, Math.toRadians(90.00))) // goes more left
+//                .lineToSplineHeading(new Pose2d(-36.14, -19.42, Math.toRadians(90.00))) // goes more left
 //                .addDisplacementMarker(() -> {
 //                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
-//                });
-//                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))); // goes backwards in the middle lane;
+//                })
+//                .lineToSplineHeading(new Pose2d(-35.95, -36.51, Math.toRadians(90.00))) // goes backwards in the middle lane
+//                .build();*/

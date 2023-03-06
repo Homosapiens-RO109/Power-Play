@@ -38,7 +38,7 @@ public class DriveConstants {
 
     public static double WHEEL_RADIUS = 1.889; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 15.40; // in
+    public static double TRACK_WIDTH = 11.92; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -46,9 +46,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.0183; // 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0.00341;
-    public static double kStatic = 0.00124;
+    public static double kV = 0.01689; // 1.0 / rpmToVelocity(MAX_RPM);
+    public static double kA = 0.0025;
+    public static double kStatic = 0.06168;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -57,10 +57,10 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 30;
-    public static double MAX_ACCEL = 30;
+    public static double MAX_VEL = 51.56;
+    public static double MAX_ACCEL = 51.56;
     public static double MAX_ANG_VEL = Math.toRadians(234.36);
-    public static double MAX_ANG_ACCEL = Math.toRadians(60);
+    public static double MAX_ANG_ACCEL = Math.toRadians(234.36); //era 80 in caz ca nu merge
 
     /*
      * Adjust the orientations here to match your robot. See the FTC SDK documentation for details.

@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -26,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Config
-@Autonomous(group = "right", name = "Partea Dreapta Con + Parcare + Viteza TM", preselectTeleOp = "Homosapiens TeleOP FSM")
-public class DreaptaConRapidTM extends LinearOpMode {
+@Autonomous(group = "leftspeed", name = "Partea Stanga Con + Parcare + Viteza TM", preselectTeleOp = "Homosapiens TeleOP FSM")
+public class StangaConRapidTM extends LinearOpMode {
 
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -134,64 +135,35 @@ public class DreaptaConRapidTM extends LinearOpMode {
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
-        TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(35, -65.87, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(12.91, -55.09, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(13.29, -16.07, Math.toRadians(90.00)))
-                .lineToSplineHeading(new Pose2d(23.88, -14.96, Math.toRadians(90.00)))
+        TrajectorySequence autonomous = drive.trajectorySequenceBuilder(new Pose2d(-36.0, -64.0, Math.toRadians(90.00)))
+                .splineTo(new Vector2d(-35.68, -20.37), Math.toRadians(90.00))
                 .addTemporalMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.THIRD);
                 })
-                .waitSeconds(1.0)
-                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
-                .waitSeconds(0.2)
-                .addTemporalMarker(() -> {
-                    ArmControl.openClip();
-                })
-                .waitSeconds(0.4)
-                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
-                .addTemporalMarker(() -> {
-                    ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
-                })
-                .waitSeconds(0.8)
-                .build();
-
-        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(putPreload.end())
-                .back(2.0)
-                .turn(-Math.toRadians(90))
-                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
-                .lineToSplineHeading(new Pose2d(65.00, -12.81, Math.toRadians(0.00)))
-                .waitSeconds(0.8)
-                .addTemporalMarker(() -> {
-                    ArmControl.closeClip();
-                })
-                .waitSeconds(0.4)
-                .addTemporalMarker(() -> {
-                    ArmControl.setArmLevel(ArmControl.Levels.FIRST);
-                })
-                .waitSeconds(0.3)
-                .build();
-
-        TrajectorySequence putCone = drive.trajectorySequenceBuilder(takeCone.end())
-                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
-                .turn(Math.toRadians(90))
-                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
-                .addTemporalMarker(() -> {
-                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
-                })
-                .waitSeconds(1.0)
-                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
-                .waitSeconds(0.5)
+                .splineTo(new Vector2d(-28.49, -1.94), Math.toRadians(15.00))
+                .waitSeconds(1.2)
                 .addTemporalMarker(() -> {
                     ArmControl.openClip();
                 })
                 .waitSeconds(0.8)
-                .back(4)
+                .back(5)
                 .addTemporalMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.DOWN);
                 })
+                .waitSeconds(5.0)
+//                .lineTo(new Vector2d(44.71, -13.74))
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
+//                })
+//                .lineToSplineHeading(new Pose2d(61.49, -11.71, Math.toRadians(1.87)))
+//                .waitSeconds(0.2)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.closeClip();
+//                })
                 .build();
 
-        drive.setPoseEstimate(putPreload.start());
+
+        drive.setPoseEstimate(autonomous.start());
 
         long secondsTillParsed = new Date().getTime() - startTime;
 
@@ -205,12 +177,70 @@ public class DreaptaConRapidTM extends LinearOpMode {
         waitForStart();
 
         if (!isStopRequested()) {
-            drive.followTrajectorySequence(putPreload);
-            drive.followTrajectorySequence(takeCone);
-            drive.followTrajectorySequence(putCone);
+            ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
+            drive.followTrajectorySequence(autonomous);
+//            drive.followTrajectorySequence(takeCone);
+//            drive.followTrajectorySequence(putCone);
         }
     }
 }
+
+
+//                .lineToSplineHeading(new Pose2d(12.91, -55.09, Math.toRadians(90.00)))
+//                .lineToSplineHeading(new Pose2d(13.29, -16.07, Math.toRadians(90.00)))
+//                .lineToSplineHeading(new Pose2d(23.88, -14.96, Math.toRadians(90.00)))
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
+//                })
+//                .waitSeconds(1.0)
+//                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
+//                .waitSeconds(0.2)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.openClip();
+//                })
+//                .waitSeconds(0.4)
+//                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
+//                })
+//                .waitSeconds(0.8)
+//                .build();
+
+//        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(putPreload.end())
+//                .back(2.0)
+//                .turn(-Math.toRadians(90))
+//                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
+//                .lineToSplineHeading(new Pose2d(65.00, -12.81, Math.toRadians(0.00)))
+//                .waitSeconds(0.8)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.closeClip();
+//                })
+//                .waitSeconds(0.4)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.FIRST);
+//                })
+//                .waitSeconds(0.3)
+//                .build();
+//
+//        TrajectorySequence putCone = drive.trajectorySequenceBuilder(takeCone.end())
+//                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
+//                .turn(Math.toRadians(90))
+//                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
+//                })
+//                .waitSeconds(1.0)
+//                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
+//                .waitSeconds(0.5)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.openClip();
+//                })
+//                .waitSeconds(0.8)
+//                .back(4)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+//                })
+//                .build();s
 
 //        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(new Pose2d(-36.14, -19.42, Math.toRadians(90.00)))
 //                .UNSTABLE_addTemporalMarkerOffset(1.47,() -> {})

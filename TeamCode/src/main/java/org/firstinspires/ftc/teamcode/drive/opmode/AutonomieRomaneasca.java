@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -46,7 +47,6 @@ public class AutonomieRomaneasca extends LinearOpMode {
     final int FIRST_ID_TAG_OF_INTEREST = 1; // 36h11 family
     final int SECOND_ID_TAG_OF_INTEREST = 2;
     final int THIRD_ID_TAG_OF_INTEREST = 0;
-
     public int aprilTagMagic(Telemetry t) {
         // This has been fixed.
         Date startTime = new Date();
@@ -69,6 +69,7 @@ public class AutonomieRomaneasca extends LinearOpMode {
             t.update();
         }
         t.addLine("Had to use default tag");
+        t.update();
         return SECOND_ID_TAG_OF_INTEREST;
     }
 
@@ -100,54 +101,52 @@ public class AutonomieRomaneasca extends LinearOpMode {
 
             @Override
             public void onError(int errorCode) {
-                telemetry.addData("Camera has errored with code.", errorCode);
+                telemetry.addData("Camera has crashed with code.", errorCode);
             }
         });
+
+        // Closes to clip so we make sure the preload stays put
+        ArmControl.closeClip();
 
         waitForStart();
 
         final long sightStartSeeing = new Date().getTime();
-//        try {
-//            aprilTag[0] = aprilTagMagic(telemetry);
-//        } catch (Exception e) {
-//            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
-//            telemetry.addLine("Failed to set proper tag :(");
-//            telemetry.addLine("Defaulted to middle choice");
-//        }
-        aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+        try {
+            aprilTag[0] = aprilTagMagic(telemetry);
+        } catch (Exception e) {
+            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+            telemetry.addLine("Failed to set proper tag :(");
+            telemetry.addLine("Defaulted to middle choice");
+        }
+
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
-        drive.setMotorPowers(0.85, 0.85, 0.85, 0.85);
-        sleep(5000);
-        drive.setMotorPowers(0.0, 0.0, 0.0, 0.0);
-        sleep(90000);
+        double xPark = 36.00;
+        double yPark = -36.00;
+
         switch (aprilTag[0]) {
-            case FIRST_ID_TAG_OF_INTEREST: {;
-                // You strafe left
-                // use weighted driving with mecanum wheels to strafe to the left for 0.5 seconds
-                drive.setMotorPowers(0, 0.5, 0.0, -0.5);
-                sleep(1000);
-                break;
-            }
-            case SECOND_ID_TAG_OF_INTEREST: {
-                // You do nothing
+            case FIRST_ID_TAG_OF_INTEREST: {
+                xPark = 13.0;
                 break;
             }
             case THIRD_ID_TAG_OF_INTEREST: {
-                // You strafe right
-                // use weighted driving with mecanum wheels to strafe to the right for 0.5 seconds
-                drive.setMotorPowers(0.5, 0.0, -0.5, 0.0);
-                sleep(1000);
-                // TODO
-                break;
-            }
-            default: {
-
+                xPark = 60.57;
                 break;
             }
         }
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(new Pose2d(36.00, -64.00, Math.toRadians(90.00)))
+                .splineTo(new Vector2d(36.00, -36.00), Math.toRadians(90.00))
+                .lineTo(new Vector2d(xPark, yPark))
+                .waitSeconds(10.0)
+                .addTemporalMarker(() -> {
+                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+                })
+                .build();
+
+        drive.setPoseEstimate(park.start());
 
         long secondsTillParsed = new Date().getTime() - startTime;
 
@@ -161,9 +160,14 @@ public class AutonomieRomaneasca extends LinearOpMode {
         waitForStart();
 
         if (!isStopRequested()) {
-            ArmControl.closeClip();
+            ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
+            drive.followTrajectorySequence(park);
+            ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+//            drive.followTrajectorySequence(takeCone);
+//            drive.followTrajectorySequence(putCone);
         }
     }
+
 }
 
 //        Pose2d startPose = new Pose2d(-35.40, -65.50, Math.toRadians(90.00));

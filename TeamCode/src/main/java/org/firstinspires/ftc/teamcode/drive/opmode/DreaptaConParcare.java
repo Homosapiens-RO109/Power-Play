@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -99,7 +100,8 @@ public class DreaptaConParcare extends LinearOpMode {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() { // old:800 x 448
-                camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_LEFT);
+                camera.startStreaming(640, 480, OpenCvCameraRotation.SIDEWAYS_RIGHT);
+                FtcDashboard.getInstance().startCameraStream(camera, 0);
                 telemetry.addLine("Camera is up.");
             }
 
@@ -115,26 +117,20 @@ public class DreaptaConParcare extends LinearOpMode {
         waitForStart();
 
         final long sightStartSeeing = new Date().getTime();
-//        try {
-//            aprilTag[0] = aprilTagMagic(telemetry);
-//        } catch (Exception e) {
-//            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
-//            telemetry.addLine("Failed to set proper tag :(");
-//            telemetry.addLine("Defaulted to middle choice");
-//        }
+        try {
+            aprilTag[0] = aprilTagMagic(telemetry);
+        } catch (Exception e) {
+            aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
+            telemetry.addLine("Failed to set proper tag :(");
+            telemetry.addLine("Defaulted to middle choice");
+        }
 
-        aprilTag[0] = SECOND_ID_TAG_OF_INTEREST;
-
-        // format the following MS to a human readable format
-//        SimpleDateFormat sdf = new SimpleDateFormat("ss.SSS");
-//        String parsed = sdf.format(new Date().getTime() - sightStartSeeing);
-
-        // TODO: eventually have this all nicely parsed out since I can't be arsed currently
         telemetry.addData("Saw tag in (ms)", new Date().getTime() - sightStartSeeing);
         telemetry.addData("Tag", aprilTag[0]);
         final long startTime = new Date().getTime();
 
         TrajectorySequence putPreload = drive.trajectorySequenceBuilder(new Pose2d(35, -65.87, Math.toRadians(90.00)))
+                .waitSeconds(1.0)
                 .lineToSplineHeading(new Pose2d(12.91, -55.09, Math.toRadians(90.00)))
                 .lineToSplineHeading(new Pose2d(13.29, -16.07, Math.toRadians(90.00)))
                 .lineToSplineHeading(new Pose2d(23.88, -14.96, Math.toRadians(90.00)))
@@ -150,45 +146,31 @@ public class DreaptaConParcare extends LinearOpMode {
                 .waitSeconds(0.4)
                 .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
                 .addTemporalMarker(() -> {
-                    ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
-                })
-                .waitSeconds(0.8)
-                .build();
-
-        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(putPreload.end())
-                .back(2.0)
-                .turn(-Math.toRadians(90))
-                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
-                .lineToSplineHeading(new Pose2d(65.00, -12.81, Math.toRadians(0.00)))
-                .waitSeconds(0.8)
-                .addTemporalMarker(() -> {
-                    ArmControl.closeClip();
-                })
-                .waitSeconds(0.4)
-                .addTemporalMarker(() -> {
-                    ArmControl.setArmLevel(ArmControl.Levels.FIRST);
-                })
-                .waitSeconds(0.3)
-                .build();
-
-        TrajectorySequence putCone = drive.trajectorySequenceBuilder(takeCone.end())
-                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
-                .turn(Math.toRadians(90))
-                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
-                .addTemporalMarker(() -> {
-                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
-                })
-                .waitSeconds(1.0)
-                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
-                .waitSeconds(0.5)
-                .addTemporalMarker(() -> {
-                    ArmControl.openClip();
-                })
-                .waitSeconds(0.8)
-                .back(4)
-                .addTemporalMarker(() -> {
                     ArmControl.setArmLevel(ArmControl.Levels.DOWN);
                 })
+                .waitSeconds(0.8)
+                .build();
+
+
+        double xPark = 36.01;
+        double yPark = -36.01;
+
+        switch (aprilTag[0]) {
+            case FIRST_ID_TAG_OF_INTEREST: {
+                xPark = 60.57;
+                break;
+            }
+            case THIRD_ID_TAG_OF_INTEREST: {
+                xPark = 13.0;
+                break;
+            }
+        }
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(putPreload.end())
+                .lineTo(new Vector2d(36.00, -11.00))
+                .lineTo(new Vector2d(36.00, -36.00))
+                .lineTo(new Vector2d(xPark, yPark))
+                .waitSeconds(8.0)
                 .build();
 
         drive.setPoseEstimate(putPreload.start());
@@ -205,12 +187,49 @@ public class DreaptaConParcare extends LinearOpMode {
         waitForStart();
 
         if (!isStopRequested()) {
+            ArmControl.setArmLevel(ArmControl.Levels.CONE_5);
             drive.followTrajectorySequence(putPreload);
-            drive.followTrajectorySequence(takeCone);
-            drive.followTrajectorySequence(putCone);
+            drive.followTrajectorySequence(park);
         }
     }
 }
+
+
+//        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(putPreload.end())
+//                .back(2.0)
+//                .turn(-Math.toRadians(90))
+//                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
+//                .lineToSplineHeading(new Pose2d(65.00, -12.81, Math.toRadians(0.00)))
+//                .waitSeconds(0.8)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.closeClip();
+//                })
+//                .waitSeconds(0.4)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.FIRST);
+//                })
+//                .waitSeconds(0.3)
+//                .build();
+//
+//        TrajectorySequence putCone = drive.trajectorySequenceBuilder(takeCone.end())
+//                .lineToSplineHeading(new Pose2d(37.34, -13.00, Math.toRadians(0.00)))
+//                .turn(Math.toRadians(90))
+//                .lineToSplineHeading(new Pose2d(23.88, -12.54, Math.toRadians(90.00)))
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.THIRD);
+//                })
+//                .waitSeconds(1.0)
+//                .lineToSplineHeading(new Pose2d(24.25, -7.15, Math.toRadians(90.00)))
+//                .waitSeconds(0.5)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.openClip();
+//                })
+//                .waitSeconds(0.8)
+//                .back(4)
+//                .addTemporalMarker(() -> {
+//                    ArmControl.setArmLevel(ArmControl.Levels.DOWN);
+//                })
+//                .build();
 
 //        TrajectorySequence takeCone = drive.trajectorySequenceBuilder(new Pose2d(-36.14, -19.42, Math.toRadians(90.00)))
 //                .UNSTABLE_addTemporalMarkerOffset(1.47,() -> {})

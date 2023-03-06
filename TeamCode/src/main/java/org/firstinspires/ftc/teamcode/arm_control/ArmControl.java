@@ -20,7 +20,7 @@ public class ArmControl {
     private static Telemetry telemetry = null;
 
     // 30, 1277, 2035, 2889
-    private static final List<Integer> armMotorLevels = Arrays.asList(3, 1300, 2100, 2920, 310,300,290,280,270);
+    private static final List<Integer> armMotorLevels = Arrays.asList(3, 1300, 2100, 2920, 360,350,340,330,320);
 
     private static final double ARM_MOTOR_POWER_UP = 0.85;
     private static final double ARM_MOTOR_POWER_DOWN = 0.75;
@@ -106,9 +106,9 @@ public class ArmControl {
 //        double finalPower = 0.0;
 
         // TODO: possibly rethink this since this we may run into further issues later on (it's fine)
-        if (level.equals(currentLevel)) {
-            return;
-        }
+//        if (level.equals(currentLevel)) {
+//            return;
+//        }
 
         if (level.compareTo(currentLevel) > 0) {
             currentArmPower = ARM_MOTOR_POWER_UP;
